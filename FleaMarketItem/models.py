@@ -14,8 +14,12 @@ class ConditionStatus(models.TextChoices):
 class Item(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     name = models.CharField(max_length=25, validators=[RegexValidator(r'^[A-Za-z0-9 \-\_]+$')])
-    description = models.TextField(blank=True, validators=[RegexValidator(r'^[A-Za-z0-9\_\-\(\)\.\,\;\&\:\=\è\'\"\! ]{1,100}$')])
-    category = models.CharField(ConditionStatus.choices, max_length=25)
-    brand = models.CharField(max_length=100, validators=[RegexValidator(r'^[A-Za-z0-9\_\-\(\)\.\,\;\&\:\=\è\'\"\! ]{1,100}$')])
+    description = models.TextField(blank=True, max_length=450, validators=[RegexValidator(r'^[A-Za-z0-9\_\-\(\)\.\,\;\&\:\=\è\'\"\! ]{1,100}$')])
+    condition = models.CharField(ConditionStatus.choices, max_length=25)
+    brand = models.CharField(max_length=100, validators=[RegexValidator(r'^[A-Za-z0-9\_\-\(\)\.\,\;\&\:\=\è\'\"\! ]{1,25}$')])
     price = models.IntegerField(validators=[validate_price])
-    description = models.CharField(max_length=200, validators=[RegexValidator(r'^[A-Za-z0-9\_\-\(\)\.\,\;\&\:\=\è\'\"\! ]{1,100}$')])
+    category = models.CharField(max_length=200, validators=[RegexValidator(r'^[A-Za-z0-9\_\-\(\)\.\,\;\&\:\=\è\'\"\! ]{1,100}$')])
+
+    def __str__(self) -> str:
+        return str(self.user) + " - " + self.name
+
