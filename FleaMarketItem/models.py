@@ -2,13 +2,14 @@ from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator
 from django.db import models
 from FleaMarketItem.validators import validate_price
+from django.utils.translation import gettext_lazy as _
 
 
 # condition enum definition
 class ConditionStatus(models.TextChoices):
-    AS_NEW = "AS_NEW",
-    GOOD_CONDITION = "GOOD_CONDITION"
-    ACCEPTABLE_CONDITION = "ACCEPTABLE_CONDITION"
+    AS_NEW = 'AN', _('AS_NEW')
+    GOOD_CONDITION = 'GC', _('GOOD_CONDITION')
+    ACCEPTABLE_CONDITION = 'AC', _('ACCEPTABLE_CONDITION')
 
 
 class Item(models.Model):
