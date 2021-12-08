@@ -1,6 +1,8 @@
 import pytest
 from mixer.backend.django import mixer
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
+
 
 
 # name
@@ -10,7 +12,7 @@ def test_item_name_of_length_more_than_30(db):
         item.full_clean()
 
 
-def test_item_name_length_equal_to_zero(db):
+def test_item_name_of_length_equal_to_zero(db):
     item = mixer.blend('FleaMarketItem.Item', name='')
     with pytest.raises(ValidationError):
         item.full_clean()
@@ -28,3 +30,61 @@ def test_item_condition_different_enum_value(db):
     item = mixer.blend('FleaMarketItem.Item', condition='SBAGLIATO')
     with pytest.raises(ValidationError):
         item.full_clean()
+
+
+# brand
+def test_item_brand_of_length_more_than_20(db):
+    item = mixer.blend('FleaMarketItem.Item', brand='A'*21)
+    with pytest.raises(ValidationError):
+        item.full_clean()
+
+
+def test_item_brand_of_length_equal_to_zero(db):
+    item = mixer.blend('FleaMarketItem.Item', brand='')
+    with pytest.raises(ValidationError):
+        item.full_clean()
+
+
+def test_item_brand_with_number(db):
+    item = mixer.blend('FleaMarketItem.Item', brand='dde98d')
+    with pytest.raises(ValidationError):
+        item.full_clean()
+
+
+# price
+def test_item_price_with_negative_value(db):
+    item = mixer.blend('FleaMarketItem.Item', price='-10')
+    with pytest.raises(ValidationError):
+        item.full_clean()
+
+
+def test_item_price_with_value_greater_than_threshold(db):
+    item = mixer.blend('FleaMarketItem.Item', price='10000000')
+    with pytest.raises(ValidationError):
+        item.full_clean()
+
+
+# category
+def test_item_category_of_length_more_than_30(db):
+    item = mixer.blend('FleaMarketItem.Item', category='A'*31)
+    with pytest.raises(ValidationError):
+        item.full_clean()
+
+
+def test_item_category_of_length_equal_to_zero(db):
+    item = mixer.blend('FleaMarketItem.Item', category='')
+    with pytest.raises(ValidationError):
+        item.full_clean()
+
+
+def test_item_category_with_number(db):
+    item = mixer.blend('FleaMarketItem.Item', category='dde98d')
+    with pytest.raises(ValidationError):
+        item.full_clean()
+
+
+def test_shopping_list_item_str(db):
+    user = mixer.blend(get_user_model(), username='prova')
+    item = mixer.blend('FleaMarketItem.Item', user=user, name='air_force')
+    tostring = item.__str__()
+    assert tostring == item.__str__()

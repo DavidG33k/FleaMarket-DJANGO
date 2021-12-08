@@ -7,14 +7,13 @@ from rest_framework.exceptions import APIException
 from django.contrib.auth import get_user_model
 
 
-
 # user
 class UserShowItemList(generics.ListAPIView):
     permission_classes = [IsUser]
     queryset = Item.objects.all()
     serializer_class = UserItemListSerializer
 
-    def get_queryset(self):  # funzione django che ritorna gli oggetti serializzati
+    def get_queryset(self):
         return Item.objects.filter(user=self.request.user)
 
 

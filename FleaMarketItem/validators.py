@@ -7,3 +7,7 @@ def validate_price(value: int) -> None:
     if not value <= 100000:
         raise ValidationError('The price must be less 100.000')
 
+
+
+
+
