@@ -93,11 +93,11 @@ def test_item_admin_created(flea_market_items, admin_user):
 ###################### path('item/edit/<int:pk>/', UserEditItemList.as_view()) ############
 # test che fa un edit di un item per un non utente
 def test_item_edit_of_non_user():
-    path = '/api/v1/item/'
+    path = '/api/v1/item/edit/<int:pk>'
     client = get_client()
     response = client.get(path)
     assert response.status_code == HTTP_403_FORBIDDEN
-    assert contains(response, 'detail', 'credentials were not provided')
+    assert contains(response, 'detail', 'credentials were not provided.')
 
 
 @pytest.fixture
