@@ -22,8 +22,6 @@ class UserAddItemList(generics.CreateAPIView):
     serializer_class = UserItemListSerializer
 
     def perform_create(self, serializer):
-        if Item.objects.filter(user=self.request.user).count() >= 10:
-            raise APIException('There are more than 10 items in your account')
         serializer.save(user=self.request.user)
 
 
@@ -42,7 +40,7 @@ class ModeratorShowUserList(generics.ListAPIView):
         return get_user_model().objects.filter(is_superuser=False).exclude(groups__name='moderator')
 
 
-class ModeratorEditItemList(generics.RetrieveUpdateDestroyAPIView):
+class ModeratorEditItemList(generics.RetrieveDestroyAPIView):
     permission_classes = [IsModerator]
     queryset = Item.objects.all()
     serializer_class = ModeratorItemListSerializer

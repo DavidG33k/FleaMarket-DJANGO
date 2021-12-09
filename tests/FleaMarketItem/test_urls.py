@@ -50,7 +50,7 @@ def test_item_user_created(flea_market_items):
     user = mixer.blend(get_user_model())
     client = get_client(user)
     response = client.post(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
-                                       'condition': 'GOOD_CONDITION', 'brand': 'dd', 'price': '20', 'category': 'maglia'})
+                                       'condition': '1', 'brand': 'dd', 'price': '20', 'category': 'maglia'})
     assert response.status_code == HTTP_201_CREATED
 # si potrebbe accorciare il data nel client.post facendo data = flea_market_items,,, MA NON FUNZIONA
 
@@ -61,10 +61,10 @@ def test_item_user_created_with_wrong_values(flea_market_items):
     user = mixer.blend(get_user_model())
     client = get_client(user)
     response = client.post(path, data={'user': flea_market_items[0].user.pk, 'name': '.', 'description': 'ddddd',
-                                    'condition': 'GOOD_CONDITION', 'brand': 'dd', 'price': '20', 'category': 'maglia'})
+                                    'condition': '1', 'brand': 'dd', 'price': '20', 'category': 'maglia'})
     assert response.status_code == HTTP_400_BAD_REQUEST
     response = client.post(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': '<',
-                                       'condition': 'GOOD_CONDITION', 'brand': 'dd', 'price': '20',
+                                       'condition': '1', 'brand': 'dd', 'price': '20',
                                        'category': 'maglia'})
     assert response.status_code == HTTP_400_BAD_REQUEST
     response = client.post(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
@@ -72,11 +72,11 @@ def test_item_user_created_with_wrong_values(flea_market_items):
                                        'category': 'maglia'})
     assert response.status_code == HTTP_400_BAD_REQUEST
     response = client.post(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
-                                       'condition': 'GOOD_CONDITION', 'brand': '!!', 'price': '20',
+                                       'condition': '1', 'brand': '!!', 'price': '20',
                                        'category': 'maglia'})
     assert response.status_code == HTTP_400_BAD_REQUEST
     response = client.post(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
-                                       'condition': 'GOOD_CONDITION', 'brand': 'dd', 'price': '-20',
+                                       'condition': '1', 'brand': 'dd', 'price': '-20',
                                        'category': 'maglia'})
     assert response.status_code == HTTP_400_BAD_REQUEST
 
@@ -88,6 +88,16 @@ def test_item_admin_created(flea_market_items, admin_user):
     response = client.get(path)
     assert response.status_code == HTTP_403_FORBIDDEN
     assert contains(response, 'detail', 'You do not have permission to perform this action')
+
+
+###################### path('item/edit/<int:pk>/', UserEditItemList.as_view()) ############
+# test che fa un edit di un item per un non utente
+def test_item_edit_of_non_user():
+    path = '/api/v1/item/'
+    client = get_client()
+    response = client.get(path)
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert contains(response, 'detail', 'credentials were not provided')
 
 
 @pytest.fixture
