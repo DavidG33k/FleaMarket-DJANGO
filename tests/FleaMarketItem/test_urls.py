@@ -92,12 +92,29 @@ def test_item_admin_created(flea_market_items, admin_user):
 
 ###################### path('item/edit/<int:pk>/', UserEditItemList.as_view()) ############
 # test che fa un edit di un item per un non utente
-def test_item_edit_of_non_user():
-    path = '/api/v1/item/edit/<int:pk>'
+def test_item_edit_of_a_non_user(flea_market_items):
+    path = '/api/v1/item/edit/' + str(flea_market_items[0].pk) + '/'
     client = get_client()
     response = client.get(path)
     assert response.status_code == HTTP_403_FORBIDDEN
     assert contains(response, 'detail', 'credentials were not provided.')
+
+
+def test_item_edit_of_an_user(flea_market_items):
+    path = '/api/v1/item/edit/' + str(flea_market_items[0].pk) + '/'
+    client = get_client(flea_market_items[0].user)
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
+                                       'condition': '1', 'brand': 'dd', 'price': '20',
+                                       'category': 'maglia'})
+    assert response.status_code == HTTP_200_OK
+
+
+def test_item_edit_of_an_admin(flea_market_items, admin_user):
+    path = '/api/v1/item/edit/' + str(flea_market_items[0].pk) + '/'
+    client = get_client(admin_user)
+    response = client.get(path)
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert contains(response, 'detail', 'You do not have permission to perform this action')
 
 
 @pytest.fixture
