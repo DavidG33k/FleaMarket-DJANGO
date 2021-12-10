@@ -14,7 +14,7 @@ def condition_status():
 class Item(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     name = models.CharField(max_length=30, validators=[RegexValidator(r'^[A-Za-z0-9]+$')])
-    description = models.TextField(blank=True, max_length=200, validators=[RegexValidator(r'^[A-Za-z0-9\(\)\!\,\è\:\;\'\"\. ]+$')])
+    description = models.TextField(blank=True, max_length=200, validators=[RegexValidator(r'^[A-Za-z0-9\(\)\!\,\è\:\;\'\"\. ]*$')])
     condition = models.IntegerField(choices=condition_status())
     brand = models.CharField(max_length=20, validators=[RegexValidator(r'^[A-Za-z\_\-\(\)]+$')])
     price = models.IntegerField(validators=[validate_price])

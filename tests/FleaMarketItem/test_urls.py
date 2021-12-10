@@ -109,12 +109,66 @@ def test_item_edit_of_an_user(flea_market_items):
     assert response.status_code == HTTP_200_OK
 
 
+def test_item_edit_of_an_user_with_wrong_values(flea_market_items):
+    path = '/api/v1/item/edit/' + str(flea_market_items[0].pk) + '/'
+    client = get_client(flea_market_items[0].user)
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': '.', 'description': 'ddddd',
+                                       'condition': '1', 'brand': 'dd', 'price': '20',
+                                       'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': '<>',
+                                      'condition': '1', 'brand': 'dd', 'price': '20',
+                                      'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
+                                      'condition': '3', 'brand': 'dd', 'price': '20',
+                                      'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
+                                      'condition': '1', 'brand': '>>', 'price': '20',
+                                      'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
+                                      'condition': '1', 'brand': 'nike', 'price': '-20',
+                                      'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
+                                      'condition': '1', 'brand': 'dd', 'price': '-20',
+                                      'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+
+
 def test_item_edit_of_an_admin(flea_market_items, admin_user):
     path = '/api/v1/item/edit/' + str(flea_market_items[0].pk) + '/'
     client = get_client(admin_user)
     response = client.get(path)
     assert response.status_code == HTTP_403_FORBIDDEN
     assert contains(response, 'detail', 'You do not have permission to perform this action')
+
+
+###################### path('users/', ModeratorShowUserList.as_view()) ############
+def test_item_path_users_of_a_non_user():
+    path = '/api/v1/users/'
+    client = get_client()
+    response = client.get(path)
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert contains(response, 'detail', 'credentials were not provided.')
+
+
+def test_item_path_users_of_an_user(flea_market_items):
+    path = '/api/v1/users/'
+    user = mixer.blend(get_user_model())
+    client = get_client(user)
+    response = client.get(path)
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert contains(response, 'detail', 'You do not have permission to perform this action')
+
+
+def test_item_path_users_of_an_admin(flea_market_items, admin_user):
+    path = '/api/v1/users/'
+    client = get_client(admin_user)
+    response = client.get(path)
+    assert response.status_code == HTTP_200_OK
 
 
 @pytest.fixture
