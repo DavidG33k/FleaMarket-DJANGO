@@ -7,3 +7,4 @@ FleaMarketItem/migrations/__pycache__
 
 FleaMarketItem/__pycache__/models.cpython-38.pyc
 *.pyc
+*.pyc
