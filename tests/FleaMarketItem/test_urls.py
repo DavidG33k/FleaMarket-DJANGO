@@ -1,9 +1,12 @@
 import json
 from mixer.backend.django import mixer
 import pytest
+from allauth import models
+from pytest_django.fixtures import admin_user
 from rest_framework.test import APIClient
-from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_405_METHOD_NOT_ALLOWED, HTTP_200_OK, HTTP_201_CREATED,HTTP_400_BAD_REQUEST
-from django.contrib.auth import get_user_model
+from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_405_METHOD_NOT_ALLOWED, HTTP_200_OK, \
+    HTTP_201_CREATED,HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND
+from django.contrib.auth import get_user_model, models
 
 
 ###################### path('item/', UserShowItemList.as_view()) ############
@@ -100,6 +103,14 @@ def test_item_edit_of_a_non_user(flea_market_items):
     assert contains(response, 'detail', 'credentials were not provided.')
 
 
+def test_item_show_single_item_of_an_user(flea_market_items):
+    path = '/api/v1/item/edit/' + str(flea_market_items[0].pk) + '/'
+    client = get_client(flea_market_items[0].user)
+    response = client.get(path)
+    assert response.status_code == HTTP_200_OK
+    obj = parse(response)
+    assert len(obj) == 7
+
 def test_item_edit_of_an_user(flea_market_items):
     path = '/api/v1/item/edit/' + str(flea_market_items[0].pk) + '/'
     client = get_client(flea_market_items[0].user)
@@ -107,6 +118,42 @@ def test_item_edit_of_an_user(flea_market_items):
                                        'condition': '1', 'brand': 'dd', 'price': '20',
                                        'category': 'maglia'})
     assert response.status_code == HTTP_200_OK
+
+
+def test_item_edit_of_an_user_with_wrong_values(flea_market_items):
+    path = '/api/v1/item/edit/' + str(flea_market_items[0].pk) + '/'
+    client = get_client(flea_market_items[0].user)
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': '.', 'description': 'ddddd',
+                                       'condition': '1', 'brand': 'dd', 'price': '20',
+                                       'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': '<>',
+                                      'condition': '1', 'brand': 'dd', 'price': '20',
+                                      'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
+                                      'condition': '3', 'brand': 'dd', 'price': '20',
+                                      'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
+                                      'condition': '1', 'brand': '>>', 'price': '20',
+                                      'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
+                                      'condition': '1', 'brand': 'nike', 'price': '-20',
+                                      'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    response = client.put(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
+                                      'condition': '1', 'brand': 'dd', 'price': '-20',
+                                      'category': 'maglia'})
+    assert response.status_code == HTTP_400_BAD_REQUEST
+
+
+def test_item_delete_item_as_user(flea_market_items):
+    path = '/api/v1/item/edit/' + str(flea_market_items[0].pk) + '/'
+    client = get_client(flea_market_items[0].user)
+    response = client.delete(path)
+    assert response.status_code == HTTP_204_NO_CONTENT
 
 
 def test_item_edit_of_an_admin(flea_market_items, admin_user):
@@ -117,6 +164,111 @@ def test_item_edit_of_an_admin(flea_market_items, admin_user):
     assert contains(response, 'detail', 'You do not have permission to perform this action')
 
 
+###################### path('users/', ModeratorShowUserList.as_view()) ############
+def test_item_path_users_of_a_non_user():
+    path = '/api/v1/users/'
+    client = get_client()
+    response = client.get(path)
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert contains(response, 'detail', 'credentials were not provided.')
+
+
+def test_item_path_users_of_an_user(users):
+    path = '/api/v1/users/'
+    user = mixer.blend(get_user_model())
+    client = get_client(user)
+    response = client.get(path)
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert contains(response, 'detail', 'You do not have permission to perform this action')
+
+
+def test_item_path_users_of_an_admin(admin_user, users):
+    path = '/api/v1/users/'
+    group = mixer.blend(models.Group, name='moderator')
+    group.user_set.add(admin_user)
+    client = get_client(admin_user)
+    response = client.get(path)
+    assert response.status_code == HTTP_200_OK
+    obj = parse(response)
+    assert len(obj) == len(users)
+
+
+###################### path('item-moderator/', ModeratorShowItemList.as_view()) ############
+def test_item_show_list_of_the_admin_as_non_authenticated_person():
+    path = '/api/v1/item-moderator/'
+    client = get_client()
+    response = client.get(path)
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert contains(response, 'detail', 'credentials were not provided')
+
+
+def test_item_show_list_of_the_admin_as_an_user(flea_market_items):
+    path = '/api/v1/item-moderator/'
+    user = mixer.blend(get_user_model())
+    client = get_client(user)
+    response = client.get(path)
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert contains(response, 'detail', 'You do not have permission to perform this action')
+
+
+def test_item_show_list_of_the_admin_as_an_user(flea_market_items, admin_user):
+    path = '/api/v1/item-moderator/'
+    group = mixer.blend(models.Group, name='moderator')
+    group.user_set.add(admin_user)
+    client = get_client(admin_user)
+    response = client.get(path)
+    assert response.status_code == HTTP_200_OK
+    obj = parse(response)
+    assert len(obj) == len(flea_market_items)
+
+
+###################### path('item-moderator/edit/<int:pk>/', ModeratorEditItemList.as_view()) ############
+def test_item_edit_moderator_as_non_authenticated_person(flea_market_items):
+    path = '/api/v1/item-moderator/edit/' + str(flea_market_items[0].pk) + '/'
+    client = get_client()
+    response = client.get(path)
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert contains(response, 'detail', 'credentials were not provided.')
+
+
+def test_item_edit_moderator_as_an_user(flea_market_items):
+    path = '/api/v1/item-moderator/edit/' + str(flea_market_items[0].pk) + '/'
+    client = get_client(flea_market_items[0].user)
+    response = client.get(path)
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert contains(response, 'detail', 'You do not have permission to perform this action')
+
+
+def test_item_edit_moderator_as_admin(flea_market_items, admin_user):
+    path = '/api/v1/item-moderator/edit/' + str(flea_market_items[0].pk) + '/'
+    group = mixer.blend(models.Group, name='moderator')
+    group.user_set.add(admin_user)
+    client = get_client(admin_user)
+    response = client.get(path)
+    assert response.status_code == HTTP_200_OK
+    obj = parse(response)
+    assert len(obj) == 2
+
+
+def test_item_edit_moderator_as_admin_with_wrong_id(flea_market_items, admin_user):
+    path = '/api/v1/item-moderator/edit/' + '999' + '/'
+    group = mixer.blend(models.Group, name='moderator')
+    group.user_set.add(admin_user)
+    client = get_client(admin_user)
+    response = client.get(path)
+    assert response.status_code == HTTP_404_NOT_FOUND
+    # assert contains(response, 'detail', 'Not Found.')
+
+
+def test_item_edit_moderator_delete(flea_market_items, admin_user):
+    path = '/api/v1/item-moderator/edit/' + str(flea_market_items[0].pk) + '/'
+    group = mixer.blend(models.Group, name='moderator')
+    group.user_set.add(admin_user)
+    client = get_client(admin_user)
+    response = client.delete(path)
+    assert response.status_code == HTTP_204_NO_CONTENT
+
+
 @pytest.fixture
 def flea_market_items(db):
     return [
@@ -125,6 +277,13 @@ def flea_market_items(db):
         mixer.blend('FleaMarketItem.Item'),
     ]
 
+@pytest.fixture()
+def users(db):
+    return [
+        mixer.blend(get_user_model()),
+        mixer.blend(get_user_model()),
+        mixer.blend(get_user_model()),
+    ]
 
 def get_client(user=None):
     res = APIClient()
