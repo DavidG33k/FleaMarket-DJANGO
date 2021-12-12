@@ -29,7 +29,7 @@ def test_item_get_of_an_authenticated_user(flea_market_items):
 
 
 # test che fa una get come admin sugli item
-def test_item_get_of_the_admin(flea_market_items, admin_user):
+def test_item_get_of_the_admin(admin_user):
     path = '/api/v1/item/'
     client = get_client(admin_user)
     response = client.get(path)
@@ -211,7 +211,7 @@ def test_item_show_list_of_the_admin_as_an_user(flea_market_items):
     assert contains(response, 'detail', 'You do not have permission to perform this action')
 
 
-def test_item_show_list_of_the_admin_as_an_user(flea_market_items, admin_user):
+def test_item_show_list_of_the_admin_as_an_admin(flea_market_items, admin_user):
     path = '/api/v1/item-moderator/'
     group = mixer.blend(models.Group, name='moderator')
     group.user_set.add(admin_user)
