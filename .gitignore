@@ -8,3 +8,14 @@ FleaMarketItem/migrations/__pycache__
 FleaMarketItem/__pycache__/models.cpython-38.pyc
 *.pyc
 *.pyc
+FleaMarketDJANGO/__pycache__/__init__.cpython-38.pyc
+FleaMarketDJANGO/__pycache__/settings.cpython-38.pyc
+FleaMarketDJANGO/__pycache__/urls.cpython-38.pyc
+FleaMarketDJANGO/__pycache__/wsgi.cpython-38.pyc
+FleaMarketItem/__pycache__/__init__.cpython-38.pyc
+FleaMarketItem/__pycache__/admin.cpython-38.pyc
+FleaMarketItem/__pycache__/apps.cpython-38.pyc
+FleaMarketItem/__pycache__/models.cpython-38.pyc
+FleaMarketItem/__pycache__/validators.cpython-38.pyc
+FleaMarketItem/migrations/__pycache__/0001_initial.cpython-38.pyc
+FleaMarketItem/migrations/__pycache__/__init__.cpython-38.pyc

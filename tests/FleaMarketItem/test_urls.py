@@ -36,6 +36,15 @@ def test_item_get_of_the_admin(admin_user):
     assert response.status_code == HTTP_403_FORBIDDEN
     assert contains(response, 'detail', 'You do not have permission to perform this action')
 
+'''
+def test_item_post_method_not_allowed(flea_market_items):
+    path = '/api/v1/item/'
+    user = mixer.blend(get_user_model())
+    client = get_client(user)
+    response = client.post(path, data={'user': flea_market_items[0].user.pk, 'name': 'antonio', 'description': 'ddddd',
+                                       'condition': '1', 'brand': 'dd', 'price': '20', 'category': 'maglia'})
+    assert response.status_code == HTTP_405_METHOD_NOT_ALLOWED
+'''
 
 ###################### path('item/add', UserAddItemList.as_view()) ############
 # test che fa un add per una persona non autentificata sugli item
