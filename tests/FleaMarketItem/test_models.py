@@ -25,7 +25,7 @@ def test_item_name_of_length_equal_to_zero(db):
 
 # description
 def test_item_description_of_length_more_than_200(db):
-    item = mixer.blend('FleaMarketItem.Item', description='A'*200)
+    item = mixer.blend('FleaMarketItem.Item', description='A'*201)
     with pytest.raises(ValidationError):
         item.full_clean()
 
