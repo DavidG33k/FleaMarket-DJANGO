@@ -6,8 +6,13 @@ from FleaMarketItem.models import Item
 # user
 class UserItemListSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('id', 'name', 'description', 'condition', 'brand', 'price', 'category')
+        fields = ('id', 'name', 'description', 'condition', 'brand', 'price', 'category', 'username','condition_status_human_readable')
         model = Item
+
+    username = serializers.SerializerMethodField()
+
+    def get_username(self,obj):
+        return obj.user.username
 
 
 class UserEditItemSerializer(serializers.ModelSerializer):
@@ -27,5 +32,3 @@ class ModeratorItemListSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'name')
         model = Item
-
-   # name = serializers.ReadOnlyField()

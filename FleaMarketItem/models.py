@@ -20,6 +20,10 @@ class Item(models.Model):
     price = models.IntegerField(validators=[validate_price])
     category = models.CharField(max_length=30, validators=[RegexValidator(r'^[A-Za-z\_\-\(\) ]+$')])
 
+
     def __str__(self) -> str:
         return "Utente: " + str(self.user) + " --> Item_name " + self.name
 
+    @property
+    def condition_status_human_readable(self):
+        return condition_status()[self.condition][1]

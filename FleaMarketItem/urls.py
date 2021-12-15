@@ -4,7 +4,7 @@ from FleaMarketItem.views import *
 
 urlpatterns = [
     # user
-    path('item/', UserShowItemList.as_view()), # ok nei test
+    path('item/', UserShowItemList.as_view()), 
     path('item/add/', UserAddItemList.as_view()),
     path('item/edit/<int:pk>/', UserEditItemList.as_view()),
 

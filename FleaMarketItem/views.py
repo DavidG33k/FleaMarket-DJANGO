@@ -50,13 +50,3 @@ class ModeratorShowItemList(generics.ListAPIView):
     permission_classes = [IsModerator]
     queryset = Item.objects.all()
     serializer_class = ModeratorItemListSerializer
-
-'''
-class ModeratorShowItemListForUser(generics.ListAPIView):
-    permission_classes = [IsModerator]
-    serializer_class = ModeratorItemListSerializer
-
-    def get_queryset(self):
-        user = self.kwargs['user']
-        return Item.objects.filter(user=user)
-'''

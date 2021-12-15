@@ -78,6 +78,7 @@ def test_item_price_with_value_greater_than_threshold(db):
 def test_item_price_with_not_permitted_values(db):
     with pytest.raises(ValidationError):
         item = mixer.blend('FleaMarketItem.Item', price='ciao')
+        item.full_clean()
 
 
 # category
