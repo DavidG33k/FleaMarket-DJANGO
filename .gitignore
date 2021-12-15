@@ -19,3 +19,4 @@ FleaMarketItem/__pycache__/models.cpython-38.pyc
 FleaMarketItem/__pycache__/validators.cpython-38.pyc
 FleaMarketItem/migrations/__pycache__/0001_initial.cpython-38.pyc
 FleaMarketItem/migrations/__pycache__/__init__.cpython-38.pyc
+db.sqlite3
