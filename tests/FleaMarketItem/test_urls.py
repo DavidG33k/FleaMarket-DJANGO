@@ -238,7 +238,7 @@ def test_item_edit_moderator_as_admin(flea_market_items, admin_user):
     response = client.get(path)
     assert response.status_code == HTTP_200_OK
     obj = parse(response)
-    assert len(obj) == 2
+    assert len(obj) == 7
 
 
 def test_item_edit_moderator_as_admin_with_wrong_id(flea_market_items, admin_user):
