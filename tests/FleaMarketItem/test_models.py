@@ -23,13 +23,6 @@ def test_item_name_of_length_equal_to_zero(db):
         item.full_clean()
 
 
-# description
-def test_item_description_of_length_more_than_200(db):
-    item = mixer.blend('FleaMarketItem.Item', description='A'*201)
-    with pytest.raises(ValidationError):
-        item.full_clean()
-
-
 def test_item_description_with_not_permitted_values(db):
     item = mixer.blend('FleaMarketItem.Item', description='<script>alert(1)</script>')
     with pytest.raises(ValidationError):
